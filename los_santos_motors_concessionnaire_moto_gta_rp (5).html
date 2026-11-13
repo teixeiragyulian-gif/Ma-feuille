@@ -1,0 +1,1440 @@
+<!DOCTYPE html>
+<html lang="fr" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Los Santos Motors | Concessionnaire Moto GTA RP</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter & Rajdhani (pour le style racing/GTA) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Rajdhani:wght@600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome pour les icônes -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        racing: ['Rajdhani', 'sans-serif'],
+                    },
+                    colors: {
+                        dark: {
+                            950: '#090a0d',
+                            900: '#0f1115',
+                            800: '#161920',
+                            700: '#1f242d',
+                            600: '#2c3340'
+                        },
+                        brand: {
+                            red: '#ef4444',
+                            orange: '#f97316',
+                            glow: 'rgba(239, 68, 68, 0.25)'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Styles personnalisés pour l'ambiance GTA RP Concessionnaire */
+        body {
+            background-color: #0f1115;
+            color: #f3f4f6;
+            background-image: 
+                radial-gradient(circle at 15% 50%, rgba(239, 68, 68, 0.06), transparent 25%),
+                radial-gradient(circle at 85% 30%, rgba(249, 115, 22, 0.06), transparent 25%);
+            min-height: 100vh;
+        }
+
+        .glass-card {
+            background: rgba(22, 25, 32, 0.78);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .glass-card-hover {
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .glass-card-hover:hover {
+            transform: translateY(-4px);
+            border-color: rgba(239, 68, 68, 0.45);
+            box-shadow: 0 12px 30px -10px rgba(239, 68, 68, 0.25);
+        }
+
+        .racing-gradient {
+            background: linear-gradient(135deg, #ef4444 0%, #f97316 100%);
+        }
+
+        .racing-text-gradient {
+            background: linear-gradient(135deg, #ef4444 0%, #f97316 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Scrollbar personnalisée */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0f1115;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #2c3340;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #ef4444;
+        }
+    </style>
+</head>
+<body class="antialiased selection:bg-red-500 selection:text-white">
+
+    <!-- NOTIFICATION TOAST CONTAINER -->
+    <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-3 max-w-sm w-full pointer-events-none px-4 sm:px-0"></div>
+
+    <!-- =====================================================================
+         VUE 1 : ÉCRAN DE CONNEXION (AUTHENTIFICATION RP)
+    ====================================================================== -->
+    <div id="login-view" class="min-h-screen flex items-center justify-center p-4">
+        <div class="w-full max-w-md glass-card rounded-2xl p-6 sm:p-8 shadow-2xl relative overflow-hidden">
+            <!-- Liseré haut -->
+            <div class="absolute top-0 left-0 right-0 h-1.5 racing-gradient"></div>
+
+            <!-- Logo & Titre -->
+            <div class="text-center mb-8">
+                <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl racing-gradient shadow-lg shadow-red-500/30 mb-4">
+                    <i class="fa-solid fa-motorcycle text-3xl text-white"></i>
+                </div>
+                <h1 class="font-racing text-3xl sm:text-4xl font-extrabold tracking-wider uppercase text-white">
+                    LOS SANTOS <span class="racing-text-gradient">MOTORS</span>
+                </h1>
+                <p class="text-gray-400 text-sm mt-1">Intranet & Catalogue Concessionnaire GTA RP</p>
+            </div>
+
+            <!-- Formulaire de connexion -->
+            <form id="login-form" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-gray-400 mb-1.5">
+                        E-mail RP ou Nom Prénom RP
+                    </label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-gray-500">
+                            <i class="fa-solid fa-user-tie"></i>
+                        </span>
+                        <input type="text" id="login-identifier" required placeholder="ex: lucas.morel@lsmotors-rp.com ou Lucas Morel"
+                            class="w-full bg-dark-900 border border-dark-600 rounded-xl py-3 pl-10 pr-4 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-red-500 transition">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-gray-400 mb-1.5">
+                        Mot de passe
+                    </label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-gray-500">
+                            <i class="fa-solid fa-lock"></i>
+                        </span>
+                        <input type="password" id="login-password" required placeholder="••••••••"
+                            class="w-full bg-dark-900 border border-dark-600 rounded-xl py-3 pl-10 pr-10 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-red-500 transition">
+                        <button type="button" id="toggle-login-pwd" class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-gray-400 hover:text-white">
+                            <i class="fa-solid fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <button type="submit" class="w-full racing-gradient hover:opacity-95 text-white font-semibold py-3 rounded-xl shadow-lg shadow-red-500/25 transition flex items-center justify-center gap-2 mt-2">
+                    <i class="fa-solid fa-right-to-bracket"></i>
+                    <span>Se connecter à l'intranet</span>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- =====================================================================
+         VUE 2 : APPLICATION PRINCIPALE (CONNECTÉ)
+    ====================================================================== -->
+    <div id="app-view" class="hidden min-h-screen flex flex-col">
+        
+        <!-- BARRE DE NAVIGATION SUPÉRIEURE -->
+        <header class="sticky top-0 z-30 glass-card border-b border-dark-700">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex items-center justify-between h-16 sm:h-20">
+                    <!-- Logo -->
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl racing-gradient flex items-center justify-center shadow-md shadow-red-500/20">
+                            <i class="fa-solid fa-motorcycle text-white text-lg"></i>
+                        </div>
+                        <div>
+                            <span class="font-racing text-xl sm:text-2xl font-extrabold tracking-wider uppercase text-white block leading-none">
+                                LOS SANTOS <span class="racing-text-gradient">MOTORS</span>
+                            </span>
+                            <span class="text-[11px] text-gray-400 tracking-widest uppercase">Concessionnaire Officiel</span>
+                        </div>
+                    </div>
+
+                    <!-- Navigation Desktop -->
+                    <nav class="hidden md:flex items-center gap-2 bg-dark-900/90 p-1.5 rounded-xl border border-dark-700">
+                        <button onclick="switchTab('catalog')" id="nav-catalog" class="nav-tab px-4 py-2 rounded-lg text-sm font-semibold transition flex items-center gap-2">
+                            <i class="fa-solid fa-motorcycle"></i>
+                            <span>Catalogue Motos</span>
+                        </button>
+                        <button onclick="switchTab('sales')" id="nav-sales" class="nav-tab px-4 py-2 rounded-lg text-sm font-semibold transition flex items-center gap-2">
+                            <i class="fa-solid fa-file-invoice-dollar"></i>
+                            <span>Mes Ventes & Suivi</span>
+                        </button>
+                        <button onclick="switchTab('salaries')" id="nav-salaries" class="nav-tab px-4 py-2 rounded-lg text-sm font-semibold transition flex items-center gap-2">
+                            <i class="fa-solid fa-wallet"></i>
+                            <span>Bilan & Salaires</span>
+                        </button>
+                        <button onclick="switchTab('employees')" id="nav-employees" class="nav-tab px-4 py-2 rounded-lg text-sm font-semibold transition flex items-center gap-2">
+                            <i class="fa-solid fa-id-card-clip"></i>
+                            <span>Employés & RH</span>
+                        </button>
+                    </nav>
+
+                    <!-- Profil Utilisateur & Déconnexion -->
+                    <div class="flex items-center gap-3">
+                        <div class="text-right hidden sm:block">
+                            <div id="user-display-name" class="text-sm font-bold text-white leading-tight">Nom RP</div>
+                            <div id="user-display-role" class="text-xs font-medium text-amber-400">Grade</div>
+                        </div>
+                        <div class="w-9 h-9 rounded-full bg-dark-700 border border-dark-600 flex items-center justify-center text-red-400 font-bold text-sm" id="user-avatar">
+                            RP
+                        </div>
+                        <button onclick="resetDemoData()" title="Réinitialiser les données de démo" class="p-2.5 rounded-xl bg-dark-800 hover:bg-dark-700 text-gray-400 hover:text-white border border-dark-700 transition">
+                            <i class="fa-solid fa-rotate-left"></i>
+                        </button>
+                        <button onclick="logout()" title="Se déconnecter" class="p-2.5 rounded-xl bg-red-500/10 hover:bg-red-500 text-red-400 hover:text-white border border-red-500/20 transition flex items-center gap-2 text-sm font-medium">
+                            <i class="fa-solid fa-power-off"></i>
+                            <span class="hidden lg:inline">Quitter</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Navigation Mobile -->
+                <div class="flex md:hidden items-center justify-between gap-1 pb-3 overflow-x-auto">
+                    <button onclick="switchTab('catalog')" id="mob-nav-catalog" class="flex-1 py-2 px-3 rounded-lg text-xs font-semibold text-center transition whitespace-nowrap">
+                        <i class="fa-solid fa-motorcycle mr-1"></i> Catalogue
+                    </button>
+                    <button onclick="switchTab('sales')" id="mob-nav-sales" class="flex-1 py-2 px-3 rounded-lg text-xs font-semibold text-center transition whitespace-nowrap">
+                        <i class="fa-solid fa-dollar-sign mr-1"></i> Ventes
+                    </button>
+                    <button onclick="switchTab('salaries')" id="mob-nav-salaries" class="flex-1 py-2 px-3 rounded-lg text-xs font-semibold text-center transition whitespace-nowrap">
+                        <i class="fa-solid fa-wallet mr-1"></i> Salaires
+                    </button>
+                    <button onclick="switchTab('employees')" id="mob-nav-employees" class="flex-1 py-2 px-3 rounded-lg text-xs font-semibold text-center transition whitespace-nowrap">
+                        <i class="fa-solid fa-users mr-1"></i> Équipe
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- CONTENU PRINCIPAL -->
+        <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+
+            <!-- ===============================================================
+                 ONGLET 1 : CATALOGUE DES MOTOS
+            ================================================================ -->
+            <section id="tab-catalog" class="space-y-6">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div>
+                        <h2 class="font-racing text-3xl font-bold uppercase tracking-wide text-white">
+                            Catalogue des <span class="racing-text-gradient">Deux-Roues</span>
+                        </h2>
+                        <p class="text-sm text-gray-400">Consultez les modèles disponibles en concession et enregistrez vos ventes en un clic.</p>
+                    </div>
+
+                    <div id="patron-catalog-actions" class="hidden">
+                        <button onclick="openBikeModal()" class="racing-gradient hover:opacity-95 text-white font-semibold px-5 py-2.5 rounded-xl shadow-lg shadow-red-500/25 transition flex items-center gap-2 text-sm">
+                            <i class="fa-solid fa-plus"></i>
+                            <span>Ajouter une moto au catalogue</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Recherche & Filtres -->
+                <div class="glass-card rounded-2xl p-4 flex flex-col lg:flex-row gap-4 justify-between items-center">
+                    <div class="relative w-full lg:w-80">
+                        <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
+                        <input type="text" id="catalog-search" oninput="renderCatalog()" placeholder="Rechercher une moto..."
+                            class="w-full bg-dark-900 border border-dark-600 rounded-xl py-2.5 pl-10 pr-4 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-red-500">
+                    </div>
+
+                    <div class="flex items-center gap-2 overflow-x-auto w-full lg:w-auto pb-1 lg:pb-0" id="category-filters">
+                        <button onclick="setCategoryFilter('Toutes')" data-cat="Toutes" class="cat-btn active px-3.5 py-2 rounded-xl text-xs font-semibold transition whitespace-nowrap">Toutes</button>
+                        <button onclick="setCategoryFilter('Sportive')" data-cat="Sportive" class="cat-btn px-3.5 py-2 rounded-xl text-xs font-semibold transition whitespace-nowrap">Sportive</button>
+                        <button onclick="setCategoryFilter('Chopper / Custom')" data-cat="Chopper / Custom" class="cat-btn px-3.5 py-2 rounded-xl text-xs font-semibold transition whitespace-nowrap">Chopper / Custom</button>
+                        <button onclick="setCategoryFilter('Cross / Off-Road')" data-cat="Cross / Off-Road" class="cat-btn px-3.5 py-2 rounded-xl text-xs font-semibold transition whitespace-nowrap">Cross / Off-Road</button>
+                        <button onclick="setCategoryFilter('Roadster / Futuriste')" data-cat="Roadster / Futuriste" class="cat-btn px-3.5 py-2 rounded-xl text-xs font-semibold transition whitespace-nowrap">Roadster / Futuriste</button>
+                    </div>
+                </div>
+
+                <div id="bikes-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+            </section>
+
+            <!-- ===============================================================
+                 ONGLET 2 : MES VENTES & SUIVI
+            ================================================================ -->
+            <section id="tab-sales" class="hidden space-y-6">
+                <div>
+                    <h2 class="font-racing text-3xl font-bold uppercase tracking-wide text-white">
+                        Registre des <span class="racing-text-gradient">Ventes & Commissions</span>
+                    </h2>
+                    <p class="text-sm text-gray-400" id="sales-subtitle">Enregistrez vos ventes RP et suivez vos commissions en temps réel.</p>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div class="glass-card rounded-2xl p-5 border-l-4 border-red-500">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-xs font-semibold uppercase tracking-wider text-gray-400" id="kpi-1-label">Ventes réalisées</p>
+                                <h3 class="font-racing text-3xl font-bold text-white mt-1" id="kpi-sales-count">0</h3>
+                            </div>
+                            <div class="w-12 h-12 rounded-xl bg-red-500/10 flex items-center justify-center text-red-400 text-xl"><i class="fa-solid fa-handshake"></i></div>
+                        </div>
+                    </div>
+                    <div class="glass-card rounded-2xl p-5 border-l-4 border-orange-500">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-xs font-semibold uppercase tracking-wider text-gray-400" id="kpi-2-label">Chiffre d'Affaires</p>
+                                <h3 class="font-racing text-3xl font-bold text-white mt-1" id="kpi-revenue">$0</h3>
+                            </div>
+                            <div class="w-12 h-12 rounded-xl bg-orange-500/10 flex items-center justify-center text-orange-400 text-xl"><i class="fa-solid fa-sack-dollar"></i></div>
+                        </div>
+                    </div>
+                    <div class="glass-card rounded-2xl p-5 border-l-4 border-emerald-500">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-xs font-semibold uppercase tracking-wider text-gray-400" id="kpi-3-label">Mes Commissions</p>
+                                <h3 class="font-racing text-3xl font-bold text-emerald-400 mt-1" id="kpi-commission">$0</h3>
+                            </div>
+                            <div class="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-400 text-xl"><i class="fa-solid fa-wallet"></i></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                    <!-- Formulaire Vente -->
+                    <div class="lg:col-span-4">
+                        <div class="glass-card rounded-2xl p-6 sticky top-24">
+                            <h3 class="font-racing text-xl font-bold uppercase text-white mb-4 flex items-center gap-2">
+                                <i class="fa-solid fa-file-signature text-red-500"></i>
+                                <span>Déclarer une vente</span>
+                            </h3>
+
+                            <form id="sale-form" class="space-y-4">
+                                <div>
+                                    <label class="block text-xs font-semibold uppercase text-gray-400 mb-1">Modèle de moto</label>
+                                    <select id="sale-bike-select" required onchange="onSaleBikeChange()"
+                                        class="w-full bg-dark-900 border border-dark-600 rounded-xl p-2.5 text-sm text-white focus:outline-none focus:border-red-500">
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <div class="flex items-center justify-between mb-1">
+                                        <label class="block text-xs font-semibold uppercase text-gray-400">Réduction partenariat (%)</label>
+                                        <span id="sale-base-price-label" class="text-[11px] text-gray-500">Prix catalogue : $0</span>
+                                    </div>
+                                    <div class="grid grid-cols-12 gap-2">
+                                        <div class="col-span-5 relative">
+                                            <input type="number" id="sale-discount" min="0" max="100" step="1" value="0" oninput="applySaleDiscount()"
+                                                class="w-full bg-dark-900 border border-dark-600 rounded-xl py-2.5 pl-3 pr-7 text-sm text-amber-400 font-bold focus:outline-none focus:border-red-500">
+                                            <span class="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs text-gray-400 font-bold">%</span>
+                                        </div>
+                                        <div class="col-span-7 flex items-center gap-1">
+                                            <button type="button" onclick="setSaleDiscount(0)" class="flex-1 py-2.5 rounded-xl bg-dark-900 hover:bg-dark-700 border border-dark-600 text-[11px] font-semibold text-gray-300 transition">0%</button>
+                                            <button type="button" onclick="setSaleDiscount(10)" class="flex-1 py-2.5 rounded-xl bg-dark-900 hover:bg-dark-700 border border-dark-600 text-[11px] font-semibold text-amber-300 transition">-10%</button>
+                                            <button type="button" onclick="setSaleDiscount(15)" class="flex-1 py-2.5 rounded-xl bg-dark-900 hover:bg-dark-700 border border-dark-600 text-[11px] font-semibold text-amber-400 transition">-15%</button>
+                                            <button type="button" onclick="setSaleDiscount(20)" class="flex-1 py-2.5 rounded-xl bg-dark-900 hover:bg-dark-700 border border-dark-600 text-[11px] font-semibold text-orange-400 transition">-20%</button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div id="sale-discount-reason-container" class="hidden space-y-1">
+                                    <label class="block text-xs font-semibold uppercase text-amber-400">
+                                        <i class="fa-solid fa-triangle-exclamation mr-1"></i> Justification de la réduction <span class="text-red-500">*</span>
+                                    </label>
+                                    <input type="text" id="sale-discount-reason" placeholder="ex: Partenariat LSPD, VIP..."
+                                        class="w-full bg-dark-900 border border-amber-500/50 rounded-xl p-2.5 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-amber-400">
+                                </div>
+
+                                <div>
+                                    <label class="block text-xs font-semibold uppercase text-gray-400 mb-1">Prix de vente final ($)</label>
+                                    <div class="relative">
+                                        <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-emerald-400 font-bold">$</span>
+                                        <input type="number" id="sale-price" required min="0" oninput="onManualSalePriceInput()"
+                                            class="w-full bg-dark-900 border border-dark-600 rounded-xl py-2.5 pl-8 pr-4 text-sm text-white font-semibold focus:outline-none focus:border-red-500">
+                                    </div>
+                                    <p id="sale-discount-savings" class="text-[11px] text-amber-400 mt-1 hidden">Remise appliquée : -$0</p>
+                                </div>
+
+                                <div class="bg-dark-900/90 border border-dark-700 rounded-xl p-3 flex items-center justify-between">
+                                    <span id="sale-commission-label" class="text-xs text-gray-400">Commission vendeur (15%) :</span>
+                                    <span id="sale-commission-preview" class="text-sm font-bold text-emerald-400">$0</span>
+                                </div>
+
+                                <button type="submit" class="w-full racing-gradient hover:opacity-95 text-white font-semibold py-3 rounded-xl shadow-lg shadow-red-500/25 transition flex items-center justify-center gap-2">
+                                    <i class="fa-solid fa-check-circle"></i>
+                                    <span>Valider la vente</span>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Tableau Historique -->
+                    <div class="lg:col-span-8">
+                        <div class="glass-card rounded-2xl p-6">
+                            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+                                <h3 class="font-racing text-xl font-bold uppercase text-white flex items-center gap-2">
+                                    <i class="fa-solid fa-clock-rotate-left text-orange-500"></i>
+                                    <span id="sales-table-title">Historique des ventes</span>
+                                </h3>
+
+                                <div id="patron-sales-filter-container" class="hidden">
+                                    <select id="sales-employee-filter" onchange="renderSales()"
+                                        class="bg-dark-900 border border-dark-600 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-red-500">
+                                        <option value="ALL">Tous les vendeurs</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left border-collapse">
+                                    <thead>
+                                        <tr class="border-b border-dark-700 text-[11px] font-semibold uppercase tracking-wider text-gray-400">
+                                            <th class="py-3 px-3">Date</th>
+                                            <th class="py-3 px-3">Moto</th>
+                                            <th class="py-3 px-3">Vendeur</th>
+                                            <th class="py-3 px-3 text-right">Prix</th>
+                                            <th class="py-3 px-3 text-right">Commission</th>
+                                            <th class="py-3 px-3 text-center">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="sales-table-body" class="divide-y divide-dark-700/60 text-sm"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ===============================================================
+                 ONGLET 4 : BILAN & SALAIRES
+            ================================================================ -->
+            <section id="tab-salaries" class="hidden space-y-6">
+                <div>
+                    <h2 class="font-racing text-3xl font-bold uppercase tracking-wide text-white">
+                        Bilan de Paie & <span class="racing-text-gradient">Salaires de la Semaine</span>
+                    </h2>
+                    <p class="text-sm text-gray-400">Consultez le chiffre d'affaires, le pourcentage de commission et le salaire total généré par chaque employé.</p>
+                </div>
+
+                <div class="glass-card rounded-2xl p-6">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="font-racing text-xl font-bold uppercase text-white flex items-center gap-2">
+                            <i class="fa-solid fa-file-invoice-dollar text-emerald-400"></i>
+                            <span id="salaries-table-title">Récapitulatif des salaires de l'équipe</span>
+                        </h3>
+                        <span id="salaries-period-badge" class="bg-dark-900 border border-dark-600 text-xs font-semibold px-3 py-1.5 rounded-xl text-emerald-400">
+                            <i class="fa-solid fa-calendar-days mr-1"></i> Semaine en cours
+                        </span>
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="border-b border-dark-700 text-[11px] font-semibold uppercase tracking-wider text-gray-400">
+                                    <th class="py-3 px-3">Employé</th>
+                                    <th class="py-3 px-3">Grade & %</th>
+                                    <th class="py-3 px-3 text-center">Ventes</th>
+                                    <th class="py-3 px-3 text-right">Chiffre d'Affaires</th>
+                                    <th class="py-3 px-3 text-right">Salaire / Commission</th>
+                                </tr>
+                            </thead>
+                            <tbody id="salaries-table-body" class="divide-y divide-dark-700/60 text-sm"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ===============================================================
+                 ONGLET 3 : EMPLOYÉS & RH
+            ================================================================ -->
+            <section id="tab-employees" class="hidden space-y-6">
+                <div>
+                    <h2 class="font-racing text-3xl font-bold uppercase tracking-wide text-white">
+                        Équipe & <span class="racing-text-gradient">Recrutement RP</span>
+                    </h2>
+                    <p class="text-sm text-gray-400">Ajoutez vos vendeurs pour générer automatiquement leur e-mail RP et leur mot de passe d'accès.</p>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                    <div id="add-employee-panel" class="lg:col-span-4 space-y-6">
+                        <div class="glass-card rounded-2xl p-6">
+                            <h3 class="font-racing text-xl font-bold uppercase text-white mb-4 flex items-center gap-2">
+                                <i class="fa-solid fa-user-plus text-red-500"></i>
+                                <span>Recruter un employé</span>
+                            </h3>
+
+                            <form id="employee-form" class="space-y-4">
+                                <div>
+                                    <label class="block text-xs font-semibold uppercase text-gray-400 mb-1">Nom & Prénom RP</label>
+                                    <input type="text" id="emp-name" required placeholder="ex: Lucas Morel" oninput="previewGeneratedEmail()"
+                                        class="w-full bg-dark-900 border border-dark-600 rounded-xl p-2.5 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-red-500">
+                                </div>
+
+                                <div>
+                                    <label class="block text-xs font-semibold uppercase text-gray-400 mb-1">Grade dans la concession</label>
+                                    <select id="emp-role" class="w-full bg-dark-900 border border-dark-600 rounded-xl p-2.5 text-sm text-white focus:outline-none focus:border-red-500"></select>
+                                </div>
+
+                                <div class="bg-dark-900/90 border border-dark-700 rounded-xl p-3.5 space-y-2">
+                                    <div class="text-[11px] font-semibold uppercase text-gray-400 flex items-center gap-1.5">
+                                        <i class="fa-solid fa-wand-magic-sparkles text-orange-400"></i>
+                                        <span>Génération automatique</span>
+                                    </div>
+                                    <div class="text-xs">
+                                        <span class="text-gray-500">E-mail RP :</span>
+                                        <span id="emp-email-preview" class="text-white font-mono break-all">prenom.nom@lsmotors-rp.com</span>
+                                    </div>
+                                    <div class="text-xs">
+                                        <span class="text-gray-500">Mot de passe :</span>
+                                        <span class="text-amber-400 font-mono">Généré à la création (LSM-XXXX)</span>
+                                    </div>
+                                </div>
+
+                                <button type="submit" class="w-full racing-gradient hover:opacity-95 text-white font-semibold py-3 rounded-xl shadow-lg shadow-red-500/25 transition flex items-center justify-center gap-2">
+                                    <i class="fa-solid fa-id-badge"></i>
+                                    <span>Créer l'employé & ses accès</span>
+                                </button>
+                            </form>
+                        </div>
+
+                        <!-- Gestion des grades -->
+                        <div class="glass-card rounded-2xl p-6">
+                            <h3 class="font-racing text-xl font-bold uppercase text-white mb-3 flex items-center gap-2">
+                                <i class="fa-solid fa-layer-group text-amber-400"></i>
+                                <span>Grades & Commissions (%)</span>
+                            </h3>
+                            <p class="text-xs text-gray-400 mb-4">Créez des grades et ajustez le pourcentage de vente attribué à chacun.</p>
+
+                            <form id="add-grade-form" class="space-y-3 mb-4">
+                                <div class="grid grid-cols-12 gap-2">
+                                    <div class="col-span-8">
+                                        <input type="text" id="new-grade-name" required placeholder="Nom du grade (ex: Senior)"
+                                            class="w-full bg-dark-900 border border-dark-600 rounded-xl p-2.5 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-red-500">
+                                    </div>
+                                    <div class="col-span-4 relative">
+                                        <input type="number" id="new-grade-commission" required min="0" max="100" step="1" value="15" title="Pourcentage de commission"
+                                            class="w-full bg-dark-900 border border-dark-600 rounded-xl py-2.5 pl-3 pr-6 text-sm text-emerald-400 font-bold focus:outline-none focus:border-red-500">
+                                        <span class="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs text-gray-400 font-bold">%</span>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <select id="new-grade-manager" class="flex-1 bg-dark-900 border border-dark-600 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-red-500">
+                                        <option value="false">Droits : Vendeur (Ventes perso)</option>
+                                        <option value="true">Droits : Direction (Catalogue & RH)</option>
+                                    </select>
+                                    <button type="submit" class="px-4 py-2.5 rounded-xl bg-dark-700 hover:bg-red-500 text-white text-xs font-semibold border border-dark-600 hover:border-red-500 transition whitespace-nowrap">
+                                        <i class="fa-solid fa-plus mr-1"></i> Ajouter
+                                    </button>
+                                </div>
+                            </form>
+
+                            <div id="grades-list" class="space-y-2"></div>
+                        </div>
+                    </div>
+
+                    <div id="employees-list-panel" class="lg:col-span-8">
+                        <div class="glass-card rounded-2xl p-6">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="font-racing text-xl font-bold uppercase text-white flex items-center gap-2">
+                                    <i class="fa-solid fa-users text-orange-500"></i>
+                                    <span>Effectif de la concession</span>
+                                </h3>
+                                <span id="employees-count-badge" class="bg-dark-900 border border-dark-600 text-xs font-semibold px-3 py-1 rounded-full text-gray-300">0 membres</span>
+                            </div>
+
+                            <div id="employees-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- MODALE 1 : MOTO -->
+    <div id="bike-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/75 backdrop-blur-sm p-4">
+        <div class="glass-card rounded-2xl max-w-lg w-full p-6 border border-dark-600 shadow-2xl relative">
+            <button onclick="closeBikeModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white w-8 h-8 rounded-lg bg-dark-800 flex items-center justify-center">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <h3 id="bike-modal-title" class="font-racing text-2xl font-bold uppercase text-white mb-4">Ajouter une moto au catalogue</h3>
+
+            <form id="bike-form" class="space-y-4">
+                <input type="hidden" id="bike-id">
+                <div>
+                    <label class="block text-xs font-semibold uppercase text-gray-400 mb-1">Nom du modèle (GTA RP)</label>
+                    <input type="text" id="bike-name" required placeholder="ex: Pegassi Bati 801"
+                        class="w-full bg-dark-900 border border-dark-600 rounded-xl p-2.5 text-sm text-white focus:outline-none focus:border-red-500">
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold uppercase text-gray-400 mb-1">Catégorie</label>
+                        <select id="bike-category" class="w-full bg-dark-900 border border-dark-600 rounded-xl p-2.5 text-sm text-white focus:outline-none focus:border-red-500">
+                            <option value="Sportive">Sportive</option>
+                            <option value="Chopper / Custom">Chopper / Custom</option>
+                            <option value="Cross / Off-Road">Cross / Off-Road</option>
+                            <option value="Roadster / Futuriste">Roadster / Futuriste</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold uppercase text-gray-400 mb-1">Prix Catalogue ($)</label>
+                        <input type="number" id="bike-price" required min="500" placeholder="45000"
+                            class="w-full bg-dark-900 border border-dark-600 rounded-xl p-2.5 text-sm text-white focus:outline-none focus:border-red-500">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold uppercase text-gray-400 mb-1">Disponibilité en stock</label>
+                    <select id="bike-stock" class="w-full bg-dark-900 border border-dark-600 rounded-xl p-2.5 text-sm text-white focus:outline-none focus:border-red-500">
+                        <option value="En stock">En stock (Disponible immédiatement)</option>
+                        <option value="Sur commande">Sur commande (24h RP)</option>
+                        <option value="Édition limitée">Édition limitée</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold uppercase text-gray-400 mb-1">URL de l'image (Optionnel)</label>
+                    <input type="url" id="bike-image" placeholder="https://..."
+                        class="w-full bg-dark-900 border border-dark-600 rounded-xl p-2.5 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-red-500">
+                </div>
+
+                <div class="flex justify-end gap-3 pt-2">
+                    <button type="button" onclick="closeBikeModal()" class="px-4 py-2.5 rounded-xl bg-dark-700 hover:bg-dark-600 text-sm font-medium text-gray-300 transition">Annuler</button>
+                    <button type="submit" class="racing-gradient hover:opacity-95 text-white font-semibold px-6 py-2.5 rounded-xl shadow-lg shadow-red-500/25 text-sm transition">Enregistrer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODALE 2 : IDENTIFIANTS DISCORD -->
+    <div id="credentials-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+        <div class="glass-card rounded-2xl max-w-md w-full p-6 border border-emerald-500/40 shadow-2xl relative">
+            <div class="w-14 h-14 rounded-2xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400 text-2xl mx-auto mb-4">
+                <i class="fa-solid fa-key"></i>
+            </div>
+
+            <h3 class="font-racing text-2xl font-bold uppercase text-center text-white">Identifiants Générés !</h3>
+            <p class="text-xs text-gray-400 text-center mt-1 mb-5">Transmettez ces accès à l'employé sur Discord ou en RP.</p>
+
+            <div class="bg-dark-950 border border-dark-700 rounded-xl p-4 space-y-3 font-mono text-sm">
+                <div>
+                    <span class="text-[11px] uppercase text-gray-500 block">Nom RP :</span>
+                    <span id="cred-name" class="text-white font-bold"></span>
+                </div>
+                <div>
+                    <span class="text-[11px] uppercase text-gray-500 block">E-mail RP (Identifiant) :</span>
+                    <span id="cred-email" class="text-orange-400 font-semibold break-all"></span>
+                </div>
+                <div>
+                    <span class="text-[11px] uppercase text-gray-500 block">Mot de passe :</span>
+                    <span id="cred-password" class="text-emerald-400 font-bold text-base"></span>
+                </div>
+            </div>
+
+            <div class="mt-6 flex flex-col gap-2.5">
+                <button type="button" onclick="copyCredentialsForDiscord()" class="w-full bg-[#5865F2] hover:bg-[#4752C4] text-white font-semibold py-3 rounded-xl shadow-lg transition flex items-center justify-center gap-2 text-sm">
+                    <i class="fa-brands fa-discord text-lg"></i>
+                    <span>Copier les accès pour Discord</span>
+                </button>
+                <button type="button" onclick="closeCredentialsModal()" class="w-full bg-dark-700 hover:bg-dark-600 text-gray-300 font-medium py-2.5 rounded-xl text-sm transition">Fermer</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const STORAGE_KEYS = {
+            USERS: 'lsm_rp_users_v2',
+            BIKES: 'lsm_rp_bikes_v2',
+            SALES: 'lsm_rp_sales_v2',
+            GRADES: 'lsm_rp_grades_v2',
+            SESSION: 'lsm_rp_session_v2'
+        };
+
+        const DEFAULT_COMMISSION_PERCENT = 15;
+
+        const DEFAULT_GRADES = [
+            { name: 'Patron', isManager: true, isSystem: true, commissionRate: 25 },
+            { name: "Co-Patron", isManager: true, isSystem: true, commissionRate: 25 },
+            { name: "Chef d'équipe", isManager: true, isSystem: false, commissionRate: 20 },
+            { name: 'Vendeur', isManager: false, isSystem: false, commissionRate: 15 },
+            { name: 'Recrue', isManager: false, isSystem: false, commissionRate: 10 }
+        ];
+
+        const DEFAULT_USERS = [
+            { id: 'usr-patron', name: 'Jordan Smith', email: 'jordan.smith@lsmotors-rp.com', password: 'patron123', role: 'Co-Patron', createdAt: '2026-01-10' },
+            { id: 'usr-emp-1', name: 'Lucas Morel', email: 'lucas.morel@lsmotors-rp.com', password: 'LSM-4829', role: 'Vendeur', createdAt: '2026-02-14' },
+            { id: 'usr-emp-2', name: 'Elena Rostova', email: 'elena.rostova@lsmotors-rp.com', password: 'LSM-7391', role: "Chef d'équipe", createdAt: '2026-03-02' }
+        ];
+
+        const DEFAULT_BIKES = [
+            { id: 'bike-1', name: 'Pegassi Bati 801', category: 'Sportive', price: 45000, stock: 'En stock', image: 'https://images.unsplash.com/photo-1558981403-c5f9899a28bc?auto=format&fit=crop&w=800&q=80' },
+            { id: 'bike-2', name: 'Shitzu Hakuchou Drag', category: 'Sportive', price: 135000, stock: 'En stock', image: 'https://images.unsplash.com/photo-1568772585407-9361f9bf3a87?auto=format&fit=crop&w=800&q=80' },
+            { id: 'bike-3', name: 'Western Nightblade', category: 'Chopper / Custom', price: 68000, stock: 'En stock', image: 'https://images.unsplash.com/photo-1558981806-ec527fa84c39?auto=format&fit=crop&w=800&q=80' },
+            { id: 'bike-4', name: 'Maibatsu Sanchez', category: 'Cross / Off-Road', price: 22000, stock: 'En stock', image: 'https://images.unsplash.com/photo-1591637333184-19aa84b3e01f?auto=format&fit=crop&w=800&q=80' },
+            { id: 'bike-5', name: 'Nagasaki Shotaro', category: 'Roadster / Futuriste', price: 280000, stock: 'Édition limitée', image: 'https://images.unsplash.com/photo-1615172282427-9a57ef2d142e?auto=format&fit=crop&w=800&q=80' },
+            { id: 'bike-6', name: 'LCC Sanctus', category: 'Chopper / Custom', price: 165000, stock: 'Sur commande', image: 'https://images.unsplash.com/photo-1558980664-2506fca6bfc2?auto=format&fit=crop&w=800&q=80' }
+        ];
+
+        const DEFAULT_SALES = [
+            { id: 'sale-101', date: '12/11/2026', bikeId: 'bike-1', bikeName: 'Pegassi Bati 801', discount: 0, discountReason: '', price: 45000, commission: 6750, sellerId: 'usr-emp-1', sellerName: 'Lucas Morel' },
+            { id: 'sale-102', date: '13/11/2026', bikeId: 'bike-2', bikeName: 'Shitzu Hakuchou Drag', discount: 15, discountReason: 'Partenariat LSPD', price: 114750, commission: 22950, sellerId: 'usr-emp-2', sellerName: 'Elena Rostova' }
+        ];
+
+        let state = { users: [], bikes: [], sales: [], grades: [], currentUser: null, selectedCategory: 'Toutes', visiblePasswords: {}, lastGeneratedCredentials: null };
+
+        function initApp() {
+            loadAllData();
+            // Suppression de renderDemoAccounts() pour masquer les comptes sur l'accueil
+
+            const togglePwdBtn = document.getElementById('toggle-login-pwd');
+            const loginPwdInput = document.getElementById('login-password');
+            if (togglePwdBtn && loginPwdInput) {
+                togglePwdBtn.addEventListener('click', () => {
+                    const isPwd = loginPwdInput.type === 'password';
+                    loginPwdInput.type = isPwd ? 'text' : 'password';
+                    togglePwdBtn.innerHTML = `<i class="fa-solid ${isPwd ? 'fa-eye-slash' : 'fa-eye'}"></i>`;
+                });
+            }
+
+            const savedSessionId = localStorage.getItem(STORAGE_KEYS.SESSION);
+            if (savedSessionId) {
+                const foundUser = state.users.find(u => u.id === savedSessionId);
+                if (foundUser) {
+                    loginUser(foundUser, true);
+                    return;
+                }
+            }
+            showLoginView();
+        }
+
+        function loadAllData() {
+            try {
+                const storedUsers = localStorage.getItem(STORAGE_KEYS.USERS);
+                const storedBikes = localStorage.getItem(STORAGE_KEYS.BIKES);
+                const storedSales = localStorage.getItem(STORAGE_KEYS.SALES);
+                const storedGrades = localStorage.getItem(STORAGE_KEYS.GRADES);
+
+                state.users = storedUsers ? JSON.parse(storedUsers) : [...DEFAULT_USERS];
+                state.bikes = storedBikes ? JSON.parse(storedBikes) : [...DEFAULT_BIKES];
+                state.sales = storedSales ? JSON.parse(storedSales) : [...DEFAULT_SALES];
+                state.grades = storedGrades ? JSON.parse(storedGrades) : [...DEFAULT_GRADES];
+
+                state.grades = state.grades.map(g => ({
+                    ...g,
+                    commissionRate: typeof g.commissionRate === 'number' ? g.commissionRate : DEFAULT_COMMISSION_PERCENT
+                }));
+
+                if (!storedUsers || !storedBikes || !storedSales || !storedGrades) saveAllData();
+            } catch (e) {
+                state.users = [...DEFAULT_USERS];
+                state.bikes = [...DEFAULT_BIKES];
+                state.sales = [...DEFAULT_SALES];
+                state.grades = [...DEFAULT_GRADES];
+            }
+        }
+
+        function saveAllData() {
+            localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(state.users));
+            localStorage.setItem(STORAGE_KEYS.BIKES, JSON.stringify(state.bikes));
+            localStorage.setItem(STORAGE_KEYS.SALES, JSON.stringify(state.sales));
+            localStorage.setItem(STORAGE_KEYS.GRADES, JSON.stringify(state.grades));
+        }
+
+        function resetDemoData() {
+            state.users = [...DEFAULT_USERS];
+            state.bikes = [...DEFAULT_BIKES];
+            state.sales = [...DEFAULT_SALES];
+            state.grades = [...DEFAULT_GRADES];
+            saveAllData();
+            if (state.currentUser) {
+                const updatedCurrent = state.users.find(u => u.id === state.currentUser.id) || state.users[0];
+                loginUser(updatedCurrent, true);
+            }
+            showToast('Données réinitialisées !', 'info');
+        }
+
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toast-container');
+            if (!container) return;
+            const colors = { success: 'border-emerald-500/60 bg-dark-800/95 text-emerald-300', error: 'border-red-500/60 bg-dark-800/95 text-red-300', info: 'border-orange-500/60 bg-dark-800/95 text-orange-200' };
+            const icons = { success: 'fa-circle-check text-emerald-400', error: 'fa-circle-exclamation text-red-400', info: 'fa-circle-info text-orange-400' };
+
+            const toast = document.createElement('div');
+            toast.className = `pointer-events-auto border ${colors[type] || colors.info} backdrop-blur-md rounded-xl p-3.5 shadow-xl flex items-center gap-3 text-sm font-medium transition-all duration-300 transform translate-y-2 opacity-0`;
+            toast.innerHTML = `<i class="fa-solid ${icons[type] || icons.info} text-lg"></i><span class="flex-1">${message}</span>`;
+            container.appendChild(toast);
+            requestAnimationFrame(() => toast.classList.remove('translate-y-2', 'opacity-0'));
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'translate-y-2');
+                setTimeout(() => toast.remove(), 300);
+            }, 3500);
+        }
+
+        function isPatron() { return state.currentUser && (state.currentUser.role === 'Patron' || state.currentUser.role === 'Co-Patron'); }
+        function isManager() {
+            if (!state.currentUser) return false;
+            if (state.currentUser.role === 'Patron' || state.currentUser.role === 'Co-Patron' || state.currentUser.role === "Chef d'équipe") return true;
+            const gradeObj = state.grades.find(g => g.name === state.currentUser.role);
+            return gradeObj ? !!gradeObj.isManager : false;
+        }
+
+        function renderDemoAccounts() {
+            const listEl = document.getElementById('demo-accounts-list');
+            if (!listEl) return;
+            // Ne filtrer que les employés non-direction pour éviter qu'ils accèdent aux comptes de direction sur l'écran de login public
+            const employeeAccounts = state.users.filter(u => u.role !== 'Patron' && u.role !== 'Co-Patron');
+            listEl.innerHTML = employeeAccounts.map(u => `
+                <button type="button" onclick="fillLoginForm('${u.email}', '${u.password}')"
+                    class="w-full text-left px-2.5 py-1.5 rounded-lg bg-dark-800 hover:bg-dark-700 border border-dark-700 transition flex items-center justify-between text-xs">
+                    <div><span class="font-semibold text-white">${u.name}</span> <span class="text-[10px] text-amber-400 ml-1.5">[${u.role}]</span></div>
+                    <span class="font-mono text-[11px] text-gray-400">${u.password}</span>
+                </button>
+            `).join('');
+        }
+
+        function fillLoginForm(email, password) {
+            document.getElementById('login-identifier').value = email;
+            document.getElementById('login-password').value = password;
+        }
+
+        document.getElementById('login-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const identifier = document.getElementById('login-identifier').value.trim().toLowerCase();
+            const password = document.getElementById('login-password').value.trim();
+            const matchedUser = state.users.find(u => (u.email.toLowerCase() === identifier || u.name.toLowerCase() === identifier) && u.password === password);
+            if (!matchedUser) {
+                showToast('Identifiant ou mot de passe incorrect.', 'error');
+                return;
+            }
+            loginUser(matchedUser);
+        });
+
+        function loginUser(user, silent = false) {
+            state.currentUser = user;
+            localStorage.setItem(STORAGE_KEYS.SESSION, user.id);
+            document.getElementById('login-view').classList.add('hidden');
+            document.getElementById('app-view').classList.remove('hidden');
+
+            document.getElementById('user-display-name').textContent = user.name;
+            document.getElementById('user-display-role').textContent = user.role;
+            document.getElementById('user-avatar').textContent = user.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+
+            const patronActions = document.getElementById('patron-catalog-actions');
+            if (isManager()) patronActions.classList.remove('hidden');
+            else patronActions.classList.add('hidden');
+
+            switchTab('catalog');
+            if (!silent) showToast(`Bienvenue, ${user.name} (${user.role}) !`, 'success');
+        }
+
+        function showLoginView() {
+            document.getElementById('app-view').classList.add('hidden');
+            document.getElementById('login-view').classList.remove('hidden');
+        }
+
+        function logout() {
+            state.currentUser = null;
+            localStorage.removeItem(STORAGE_KEYS.SESSION);
+            document.getElementById('login-form').reset();
+            showLoginView();
+            showToast('Vous avez été déconnecté.', 'info');
+        }
+
+        function switchTab(tabName) {
+            ['catalog', 'sales', 'salaries', 'employees'].forEach(t => {
+                const sec = document.getElementById(`tab-${t}`);
+                const desk = document.getElementById(`nav-${t}`);
+                const mob = document.getElementById(`mob-nav-${t}`);
+                if (t === tabName) {
+                    if (sec) sec.classList.remove('hidden');
+                    if (desk) { desk.classList.add('racing-gradient', 'text-white', 'shadow-md'); desk.classList.remove('text-gray-400'); }
+                    if (mob) { mob.classList.add('racing-gradient', 'text-white'); mob.classList.remove('bg-dark-800', 'text-gray-400'); }
+                } else {
+                    if (sec) sec.classList.add('hidden');
+                    if (desk) { desk.classList.remove('racing-gradient', 'text-white', 'shadow-md'); desk.classList.add('text-gray-400'); }
+                    if (mob) { mob.classList.remove('racing-gradient', 'text-white'); mob.classList.add('bg-dark-800', 'text-gray-400'); }
+                }
+            });
+            if (tabName === 'catalog') renderCatalog();
+            if (tabName === 'sales') { populateSaleBikeSelect(); renderSales(); }
+            if (tabName === 'salaries') renderSalaries();
+            if (tabName === 'employees') renderEmployees();
+        }
+
+        function setCategoryFilter(category) {
+            state.selectedCategory = category;
+            renderCatalog();
+        }
+
+        function getCategoryFallbackImage(category) {
+            const map = {
+                'Sportive': 'https://images.unsplash.com/photo-1558981403-c5f9899a28bc?auto=format&fit=crop&w=800&q=80',
+                'Chopper / Custom': 'https://images.unsplash.com/photo-1558981806-ec527fa84c39?auto=format&fit=crop&w=800&q=80',
+                'Cross / Off-Road': 'https://images.unsplash.com/photo-1591637333184-19aa84b3e01f?auto=format&fit=crop&w=800&q=80',
+                'Roadster / Futuriste': 'https://images.unsplash.com/photo-1615172282427-9a57ef2d142e?auto=format&fit=crop&w=800&q=80'
+            };
+            return map[category] || map['Sportive'];
+        }
+
+        function renderCatalog() {
+            const grid = document.getElementById('bikes-grid');
+            const searchQuery = (document.getElementById('catalog-search').value || '').toLowerCase().trim();
+
+            document.querySelectorAll('.cat-btn').forEach(btn => {
+                if (btn.dataset.cat === state.selectedCategory) {
+                    btn.classList.add('racing-gradient', 'text-white', 'shadow-md');
+                    btn.classList.remove('bg-dark-800', 'text-gray-400');
+                } else {
+                    btn.classList.remove('racing-gradient', 'text-white', 'shadow-md');
+                    btn.classList.add('bg-dark-800', 'text-gray-400');
+                }
+            });
+
+            const filteredBikes = state.bikes.filter(bike => {
+                const matchCat = state.selectedCategory === 'Toutes' || bike.category === state.selectedCategory;
+                const matchSearch = bike.name.toLowerCase().includes(searchQuery) || bike.category.toLowerCase().includes(searchQuery);
+                return matchCat && matchSearch;
+            });
+
+            if (filteredBikes.length === 0) {
+                grid.innerHTML = `<div class="col-span-full glass-card rounded-2xl p-10 text-center"><i class="fa-solid fa-motorcycle text-4xl text-gray-600 mb-3"></i><h3 class="text-lg font-bold text-white">Aucune moto trouvée</h3></div>`;
+                return;
+            }
+
+            grid.innerHTML = filteredBikes.map(bike => {
+                const stockClass = bike.stock === 'En stock' ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30' : bike.stock === 'Édition limitée' ? 'bg-amber-500/20 text-amber-300 border-amber-500/30' : 'bg-orange-500/20 text-orange-300 border-orange-500/30';
+                const imgSrc = bike.image && bike.image.trim() !== '' ? bike.image : getCategoryFallbackImage(bike.category);
+
+                return `
+                    <div class="glass-card glass-card-hover rounded-2xl overflow-hidden flex flex-col justify-between">
+                        <div>
+                            <div class="relative h-48 bg-dark-900 overflow-hidden">
+                                <img src="${imgSrc}" alt="${bike.name}" onerror="this.onerror=null;this.src='https://placehold.co/800x500/161920/ef4444?text=${encodeURIComponent(bike.name)}';" class="w-full h-full object-cover">
+                                <span class="absolute top-3 left-3 bg-dark-950/85 backdrop-blur-md border border-white/10 text-[11px] font-semibold uppercase px-2.5 py-1 rounded-lg text-gray-200">${bike.category}</span>
+                                <span class="absolute top-3 right-3 border ${stockClass} backdrop-blur-md text-[11px] font-semibold px-2.5 py-1 rounded-lg">${bike.stock}</span>
+                            </div>
+                            <div class="p-5">
+                                <h3 class="font-racing text-2xl font-bold text-white leading-tight">${bike.name}</h3>
+                                <div class="mt-2 flex items-baseline gap-2">
+                                    <span class="font-racing text-2xl font-extrabold text-emerald-400">$${Number(bike.price).toLocaleString('fr-FR')}</span>
+                                    <span class="text-xs text-gray-500">TTC</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="px-5 pb-5 pt-2 flex items-center gap-2">
+                            <button onclick="quickSellBike('${bike.id}')" class="flex-1 racing-gradient hover:opacity-95 text-white font-semibold py-2.5 px-4 rounded-xl text-xs sm:text-sm shadow-md transition flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-tag"></i><span>Vendre</span>
+                            </button>
+                            ${isManager() ? `
+                                <button onclick="openBikeModal('${bike.id}')" class="p-2.5 rounded-xl bg-dark-800 hover:bg-dark-700 text-gray-300 border border-dark-600"><i class="fa-solid fa-pen text-xs"></i></button>
+                                <button onclick="deleteBike('${bike.id}')" class="p-2.5 rounded-xl bg-red-500/10 hover:bg-red-500 text-red-400 border border-red-500/20"><i class="fa-solid fa-trash text-xs"></i></button>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function openBikeModal(bikeId = null) {
+            const modal = document.getElementById('bike-modal');
+            const title = document.getElementById('bike-modal-title');
+            document.getElementById('bike-form').reset();
+            if (bikeId) {
+                const bike = state.bikes.find(b => b.id === bikeId);
+                if (!bike) return;
+                title.textContent = 'Modifier la moto';
+                document.getElementById('bike-id').value = bike.id;
+                document.getElementById('bike-name').value = bike.name;
+                document.getElementById('bike-category').value = bike.category;
+                document.getElementById('bike-price').value = bike.price;
+                document.getElementById('bike-stock').value = bike.stock;
+                document.getElementById('bike-image').value = bike.image || '';
+            } else {
+                title.textContent = 'Ajouter une moto au catalogue';
+                document.getElementById('bike-id').value = '';
+            }
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeBikeModal() {
+            document.getElementById('bike-modal').classList.add('hidden');
+            document.getElementById('bike-modal').classList.remove('flex');
+        }
+
+        document.getElementById('bike-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            if (!isManager()) return;
+            const id = document.getElementById('bike-id').value;
+            const name = document.getElementById('bike-name').value.trim();
+            const category = document.getElementById('bike-category').value;
+            const price = parseFloat(document.getElementById('bike-price').value);
+            const stock = document.getElementById('bike-stock').value;
+            const image = document.getElementById('bike-image').value.trim();
+
+            if (id) {
+                const idx = state.bikes.findIndex(b => b.id === id);
+                if (idx !== -1) state.bikes[idx] = { ...state.bikes[idx], name, category, price, stock, image };
+                showToast('Moto mise à jour !', 'success');
+            } else {
+                state.bikes.unshift({ id: 'bike-' + Date.now(), name, category, price, stock, image });
+                showToast('Moto ajoutée !', 'success');
+            }
+            saveAllData();
+            closeBikeModal();
+            renderCatalog();
+        });
+
+        function deleteBike(bikeId) {
+            if (!isManager()) return;
+            state.bikes = state.bikes.filter(b => b.id !== bikeId);
+            saveAllData();
+            renderCatalog();
+            showToast('Moto supprimée.', 'info');
+        }
+
+        function quickSellBike(bikeId) {
+            switchTab('sales');
+            const select = document.getElementById('sale-bike-select');
+            if (select) { select.value = bikeId; onSaleBikeChange(); }
+        }
+
+        function getUserCommissionPercent(user) {
+            if (!user) return DEFAULT_COMMISSION_PERCENT;
+            const gradeObj = state.grades.find(g => g.name === user.role);
+            return gradeObj && typeof gradeObj.commissionRate === 'number' ? gradeObj.commissionRate : DEFAULT_COMMISSION_PERCENT;
+        }
+
+        function populateSaleBikeSelect() {
+            const select = document.getElementById('sale-bike-select');
+            if (!select) return;
+            select.innerHTML = state.bikes.map(b => `<option value="${b.id}" data-price="${b.price}">${b.name} — $${Number(b.price).toLocaleString('fr-FR')}</option>`).join('');
+            onSaleBikeChange();
+        }
+
+        function onSaleBikeChange() {
+            const select = document.getElementById('sale-bike-select');
+            const opt = select.options[select.selectedIndex];
+            if (opt) {
+                const basePrice = parseFloat(opt.dataset.price) || 0;
+                document.getElementById('sale-base-price-label').textContent = `Prix catalogue : $${basePrice.toLocaleString('fr-FR')}`;
+                document.getElementById('sale-discount').value = 0;
+                applySaleDiscount();
+            }
+        }
+
+        function setSaleDiscount(percent) {
+            document.getElementById('sale-discount').value = percent;
+            applySaleDiscount();
+        }
+
+        function applySaleDiscount() {
+            const select = document.getElementById('sale-bike-select');
+            const opt = select ? select.options[select.selectedIndex] : null;
+            const basePrice = opt ? (parseFloat(opt.dataset.price) || 0) : 0;
+            const discount = Math.max(0, Math.min(100, parseFloat(document.getElementById('sale-discount').value) || 0));
+
+            const finalPrice = Math.round(basePrice * (1 - discount / 100));
+            const savings = basePrice - finalPrice;
+            document.getElementById('sale-price').value = finalPrice;
+
+            const savingsEl = document.getElementById('sale-discount-savings');
+            const reasonContainer = document.getElementById('sale-discount-reason-container');
+            const reasonInput = document.getElementById('sale-discount-reason');
+
+            if (discount > 0) {
+                if (savingsEl && savings > 0) {
+                    savingsEl.textContent = `Remise appliquée (-${discount}%) : -$${savings.toLocaleString('fr-FR')}`;
+                    savingsEl.classList.remove('hidden');
+                }
+                if (reasonContainer) {
+                    reasonContainer.classList.remove('hidden');
+                    if (reasonInput) reasonInput.required = true;
+                }
+            } else {
+                if (savingsEl) savingsEl.classList.add('hidden');
+                if (reasonContainer) {
+                    reasonContainer.classList.add('hidden');
+                    if (reasonInput) { reasonInput.required = false; reasonInput.value = ''; }
+                }
+            }
+            updateCommissionPreview();
+        }
+
+        function onManualSalePriceInput() {
+            document.getElementById('sale-discount-savings').classList.add('hidden');
+            updateCommissionPreview();
+        }
+
+        function updateCommissionPreview() {
+            const price = parseFloat(document.getElementById('sale-price').value) || 0;
+            const rate = getUserCommissionPercent(state.currentUser);
+            const comm = Math.round(price * (rate / 100));
+            document.getElementById('sale-commission-label').textContent = `Commission (${rate}%) :`;
+            document.getElementById('sale-commission-preview').textContent = `$${comm.toLocaleString('fr-FR')}`;
+        }
+
+        document.getElementById('sale-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            if (!state.currentUser) return;
+            const bikeId = document.getElementById('sale-bike-select').value;
+            const bike = state.bikes.find(b => b.id === bikeId);
+            if (!bike) return;
+
+            const discount = parseFloat(document.getElementById('sale-discount')?.value) || 0;
+            const reasonInput = document.getElementById('sale-discount-reason');
+            const discountReason = reasonInput ? reasonInput.value.trim() : '';
+
+            if (discount > 0 && !discountReason) {
+                showToast('Veuillez justifier la réduction appliquée.', 'error');
+                if (reasonInput) reasonInput.focus();
+                return;
+            }
+
+            const price = parseFloat(document.getElementById('sale-price').value);
+            const rate = getUserCommissionPercent(state.currentUser);
+            const commission = Math.round(price * (rate / 100));
+
+            state.sales.unshift({
+                id: 'sale-' + Date.now(),
+                date: new Date().toLocaleDateString('fr-FR'),
+                bikeId: bike.id,
+                bikeName: bike.name,
+                discount,
+                discountReason,
+                price,
+                commission,
+                sellerId: state.currentUser.id,
+                sellerName: state.currentUser.name
+            });
+            saveAllData();
+            document.getElementById('sale-discount').value = 0;
+            if (reasonInput) reasonInput.value = '';
+            onSaleBikeChange();
+            renderSales();
+            showToast(`Vente validée ! Commission : +$${commission.toLocaleString('fr-FR')}`, 'success');
+        });
+
+        function renderSales() {
+            const filterContainer = document.getElementById('patron-sales-filter-container');
+            const filterSelect = document.getElementById('sales-employee-filter');
+            let displayedSales = [];
+
+            if (isManager()) {
+                filterContainer.classList.remove('hidden');
+                const currentFilter = filterSelect.value || 'ALL';
+                filterSelect.innerHTML = `<option value="ALL">Tous les vendeurs</option>` + state.users.map(u => `<option value="${u.id}" ${currentFilter === u.id ? 'selected' : ''}>${u.name}</option>`).join('');
+                displayedSales = currentFilter === 'ALL' ? state.sales : state.sales.filter(s => s.sellerId === currentFilter);
+                document.getElementById('sales-table-title').textContent = 'Toutes les ventes';
+            } else {
+                filterContainer.classList.add('hidden');
+                displayedSales = state.sales.filter(s => s.sellerId === state.currentUser.id);
+                document.getElementById('sales-table-title').textContent = 'Mes ventes personnelles';
+            }
+
+            document.getElementById('kpi-sales-count').textContent = displayedSales.length;
+            document.getElementById('kpi-revenue').textContent = `$${displayedSales.reduce((a, s) => a + Number(s.price), 0).toLocaleString('fr-FR')}`;
+            document.getElementById('kpi-commission').textContent = `$${displayedSales.reduce((a, s) => a + Number(s.commission), 0).toLocaleString('fr-FR')}`;
+
+            const tbody = document.getElementById('sales-table-body');
+            if (displayedSales.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="py-8 text-center text-gray-500 text-sm">Aucune vente enregistrée.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = displayedSales.map(sale => {
+                const canDelete = isManager() || sale.sellerId === state.currentUser.id;
+                const discountBadge = sale.discount && Number(sale.discount) > 0 ? `<span class="ml-1.5 inline-block bg-amber-500/15 border border-amber-500/30 text-amber-400 text-[10px] font-bold px-1.5 py-0.5 rounded" title="Motif : ${sale.discountReason || ''}">-${sale.discount}%</span>` : '';
+                return `
+                    <tr class="hover:bg-dark-800/60 transition">
+                        <td class="py-3 px-3 text-xs text-gray-400 whitespace-nowrap">${sale.date}</td>
+                        <td class="py-3 px-3 font-semibold text-white">${sale.bikeName}${discountBadge}</td>
+                        <td class="py-3 px-3 text-xs text-gray-300 whitespace-nowrap">${sale.sellerName}</td>
+                        <td class="py-3 px-3 text-right font-semibold text-white whitespace-nowrap">$${Number(sale.price).toLocaleString('fr-FR')}</td>
+                        <td class="py-3 px-3 text-right font-bold text-emerald-400 whitespace-nowrap">+$${Number(sale.commission).toLocaleString('fr-FR')}</td>
+                        <td class="py-3 px-3 text-center">
+                            ${canDelete ? `<button onclick="deleteSale('${sale.id}')" class="p-1.5 rounded-lg bg-red-500/10 hover:bg-red-500 text-red-400 hover:text-white transition"><i class="fa-solid fa-trash text-xs"></i></button>` : '-'}
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function deleteSale(saleId) {
+            state.sales = state.sales.filter(s => s.id !== saleId);
+            saveAllData();
+            renderSales();
+            showToast('Vente supprimée.', 'info');
+        }
+
+        function renderSalaries() {
+            const tbody = document.getElementById('salaries-table-body');
+            if (!tbody) return;
+            const targetUsers = isManager() ? state.users : state.users.filter(u => u.id === state.currentUser.id);
+
+            tbody.innerHTML = targetUsers.map(emp => {
+                const empSales = state.sales.filter(s => s.sellerId === emp.id);
+                const turnover = empSales.reduce((acc, s) => acc + Number(s.price), 0);
+                const comm = empSales.reduce((acc, s) => acc + Number(s.commission), 0);
+                const rate = getUserCommissionPercent(emp);
+                const isMe = state.currentUser && state.currentUser.id === emp.id;
+
+                return `
+                    <tr class="hover:bg-dark-800/60 transition ${isMe ? 'bg-dark-800/30' : ''}">
+                        <td class="py-3.5 px-3">
+                            <span class="font-bold text-white block">${emp.name} ${isMe ? '<span class="text-xs text-amber-400">(Vous)</span>' : ''}</span>
+                            <span class="text-[11px] text-gray-400">${emp.email}</span>
+                        </td>
+                        <td class="py-3.5 px-3"><span class="bg-dark-900 border border-dark-600 text-amber-300 text-xs font-semibold px-2.5 py-1 rounded-md">${emp.role} (${rate}%)</span></td>
+                        <td class="py-3.5 px-3 text-center font-semibold text-white">${empSales.length}</td>
+                        <td class="py-3.5 px-3 text-right font-semibold text-white">$${turnover.toLocaleString('fr-FR')}</td>
+                        <td class="py-3.5 px-3 text-right font-racing text-lg font-extrabold text-emerald-400">+$${comm.toLocaleString('fr-FR')}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function generateRPEmail(fullName) {
+            const cleaned = fullName.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9\s]/g, "").trim().replace(/\s+/g, ".");
+            let email = `${cleaned || 'employe'}@lsmotors-rp.com`;
+            let c = 2;
+            while (state.users.some(u => u.email === email)) { email = `${cleaned}${c}@lsmotors-rp.com`; c++; }
+            return email;
+        }
+
+        function generateRPPassword() { return `LSM-${Math.floor(1000 + Math.random() * 9000)}`; }
+
+        function previewGeneratedEmail() {
+            const name = document.getElementById('emp-name').value.trim();
+            document.getElementById('emp-email-preview').textContent = name ? generateRPEmail(name) : 'prenom.nom@lsmotors-rp.com';
+        }
+
+        document.getElementById('employee-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            if (!isManager()) return;
+            const name = document.getElementById('emp-name').value.trim();
+            const role = document.getElementById('emp-role').value;
+            if (!name) return;
+
+            const newEmp = {
+                id: 'usr-' + Date.now(),
+                name,
+                email: generateRPEmail(name),
+                password: generateRPPassword(),
+                role,
+                createdAt: new Date().toLocaleDateString('fr-FR')
+            };
+            state.users.push(newEmp);
+            saveAllData();
+            document.getElementById('employee-form').reset();
+            previewGeneratedEmail();
+            renderEmployees();
+            openCredentialsModal(newEmp);
+            showToast(`Employé ${name} créé !`, 'success');
+        });
+
+        function openCredentialsModal(user) {
+            state.lastGeneratedCredentials = user;
+            document.getElementById('cred-name').textContent = user.name;
+            document.getElementById('cred-email').textContent = user.email;
+            document.getElementById('cred-password').textContent = user.password;
+            document.getElementById('credentials-modal').classList.remove('hidden');
+            document.getElementById('credentials-modal').classList.add('flex');
+        }
+
+        function closeCredentialsModal() {
+            document.getElementById('credentials-modal').classList.add('hidden');
+            document.getElementById('credentials-modal').classList.remove('flex');
+        }
+
+        function copyCredentialsForDiscord(userObj = null) {
+            const target = userObj || state.lastGeneratedCredentials;
+            if (!target) return;
+            const text = `🏍️ **LOS SANTOS MOTORS - Accès Intranet**\n👤 **Nom RP :** ${target.name} (${target.role})\n📧 **E-mail RP :** \`${target.email}\`\n🔑 **Mot de passe :** \`${target.password}\``;
+            const ta = document.createElement('textarea');
+            ta.value = text;
+            ta.style.position = 'fixed';
+            ta.style.left = '-9999px';
+            document.body.appendChild(ta);
+            ta.select();
+            try { document.execCommand('copy'); showToast('Accès copiés !', 'success'); } catch (err) { showToast('Erreur de copie.', 'error'); }
+            document.body.removeChild(ta);
+        }
+
+        function togglePasswordVisibility(userId) {
+            state.visiblePasswords[userId] = !state.visiblePasswords[userId];
+            renderEmployees();
+        }
+
+        function changeEmployeeRole(userId, newRole) {
+            if (!isManager()) return;
+            const user = state.users.find(u => u.id === userId);
+            if (!user) return;
+            user.role = newRole;
+            saveAllData();
+            renderEmployees();
+            showToast('Grade modifié.', 'success');
+        }
+
+        function regenerateEmployeePassword(userId) {
+            if (!isManager()) return;
+            const user = state.users.find(u => u.id === userId);
+            if (!user) return;
+            user.password = generateRPPassword();
+            state.visiblePasswords[userId] = true;
+            saveAllData();
+            renderEmployees();
+            showToast(`Nouveau MDP : ${user.password}`, 'success');
+        }
+
+        function deleteEmployee(userId) {
+            if (!isPatron()) return;
+            state.users = state.users.filter(u => u.id !== userId);
+            saveAllData();
+            renderEmployees();
+            showToast('Employé supprimé.', 'info');
+        }
+
+        function renderGradesUI() {
+            const select = document.getElementById('emp-role');
+            const list = document.getElementById('grades-list');
+            if (!select || !list) return;
+
+            const cur = select.value;
+            select.innerHTML = state.grades.map(g => `<option value="${g.name}" ${g.name === (cur || 'Vendeur') ? 'selected' : ''}>${g.name} — ${g.commissionRate}%</option>`).join('');
+
+            list.innerHTML = state.grades.map(g => `
+                <div class="flex items-center justify-between gap-2 bg-dark-900 border border-dark-700 rounded-xl px-3 py-2 text-xs">
+                    <span class="font-semibold text-gray-200">${g.name}</span>
+                    <div class="flex items-center gap-2">
+                        <div class="relative flex items-center">
+                            <input type="number" min="0" max="100" value="${g.commissionRate}" onchange="updateGradeCommission('${g.name.replace(/'/g, "\\'")}', this.value)" class="w-16 bg-dark-950 border border-dark-600 rounded-lg py-1 pl-2 pr-5 text-right font-mono font-bold text-emerald-400 text-xs focus:outline-none">
+                            <span class="absolute right-1.5 text-[10px] text-gray-400">%</span>
+                        </div>
+                        ${!g.isSystem ? `<button onclick="deleteGrade('${g.name.replace(/'/g, "\\'")}')" class="text-gray-500 hover:text-red-400"><i class="fa-solid fa-trash text-[11px]"></i></button>` : '<span class="w-5"></span>'}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function updateGradeCommission(name, val) {
+            if (!isManager()) return;
+            const g = state.grades.find(item => item.name === name);
+            if (g) { g.commissionRate = Math.max(0, Math.min(100, parseFloat(val) || 0)); saveAllData(); renderGradesUI(); renderEmployees(); showToast('Commission mise à jour.', 'success'); }
+        }
+
+        document.getElementById('add-grade-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            if (!isManager()) return;
+            const nameInput = document.getElementById('new-grade-name');
+            const commInput = document.getElementById('new-grade-commission');
+            const isMgr = document.getElementById('new-grade-manager').value === 'true';
+            const name = nameInput.value.trim();
+            if (!name) return;
+
+            if (state.grades.some(g => g.name.toLowerCase() === name.toLowerCase())) { showToast('Ce grade existe déjà.', 'error'); return; }
+            state.grades.push({ name, isManager: isMgr, isSystem: false, commissionRate: parseFloat(commInput.value) || 15 });
+            saveAllData();
+            nameInput.value = '';
+            renderGradesUI();
+            renderEmployees();
+            showToast('Grade ajouté !', 'success');
+        });
+
+        function deleteGrade(name) {
+            if (!isManager()) return;
+            state.grades = state.grades.filter(g => g.name !== name);
+            saveAllData();
+            renderGradesUI();
+            showToast('Grade supprimé.', 'info');
+        }
+
+        function renderEmployees() {
+            const addPanel = document.getElementById('add-employee-panel');
+            const listPanel = document.getElementById('employees-list-panel');
+            if (isManager()) { addPanel.classList.remove('hidden'); listPanel.className = 'lg:col-span-8'; renderGradesUI(); }
+            else { addPanel.classList.add('hidden'); listPanel.className = 'lg:col-span-12'; }
+
+            document.getElementById('employees-count-badge').textContent = `${state.users.length} membres`;
+            const grid = document.getElementById('employees-grid');
+
+            grid.innerHTML = state.users.map(emp => {
+                const empSales = state.sales.filter(s => s.sellerId === emp.id);
+                const revenue = empSales.reduce((sum, s) => sum + Number(s.price), 0);
+                const isPwdVisible = !!state.visiblePasswords[emp.id];
+                const canSee = isManager() || state.currentUser.id === emp.id;
+                const canEditRole = isManager() && emp.role !== 'Patron' && emp.role !== 'Co-Patron';
+                const rate = getUserCommissionPercent(emp);
+
+                return `
+                    <div class="bg-dark-900/90 border border-dark-700 rounded-2xl p-4 flex flex-col justify-between gap-4">
+                        <div>
+                            <div class="flex items-start justify-between gap-2">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 rounded-xl bg-dark-850 border border-dark-600 flex items-center justify-center font-bold text-red-400 text-sm">
+                                        ${emp.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase()}
+                                    </div>
+                                    <div>
+                                        <h4 class="font-bold text-white text-base">${emp.name}</h4>
+                                        ${canEditRole ? `
+                                            <select onchange="changeEmployeeRole('${emp.id}', this.value)" class="mt-1 bg-dark-800 border border-dark-600 text-[11px] font-bold text-amber-300 rounded-md px-2 py-0.5 focus:outline-none">
+                                                ${state.grades.map(g => `<option value="${g.name}" ${g.name === emp.role ? 'selected' : ''}>${g.name} (${g.commissionRate}%)</option>`).join('')}
+                                            </select>
+                                        ` : `<span class="text-xs text-amber-400">${emp.role} (${rate}%)</span>`}
+                                    </div>
+                                </div>
+                                ${isPatron() && emp.role !== 'Patron' && emp.role !== 'Co-Patron' ? `<button onclick="deleteEmployee('${emp.id}')" class="p-2 rounded-lg bg-red-500/10 hover:bg-red-500 text-red-400"><i class="fa-solid fa-user-xmark text-xs"></i></button>` : ''}
+                            </div>
+                            ${canSee ? `
+                                <div class="mt-4 bg-dark-950/90 border border-dark-700 rounded-xl p-3 space-y-2 text-xs">
+                                    <div class="flex justify-between"><span class="text-gray-500">E-mail :</span><span class="text-gray-200 font-mono">${emp.email}</span></div>
+                                    <div class="flex justify-between items-center"><span class="text-gray-500">MDP :</span>
+                                        <div class="flex items-center gap-2">
+                                            <span class="font-mono font-bold ${isPwdVisible ? 'text-emerald-400' : 'text-gray-500'}">${isPwdVisible ? emp.password : '••••••••'}</span>
+                                            <button onclick="togglePasswordVisibility('${emp.id}')" class="text-gray-400 hover:text-white"><i class="fa-solid ${isPwdVisible ? 'fa-eye-slash' : 'fa-eye'}"></i></button>
+                                        </div>
+                                    </div>
+                                    <div class="pt-2 border-t border-dark-800 flex justify-between">
+                                        <button onclick='copyCredentialsForDiscord(${JSON.stringify(emp)})' class="text-[11px] text-[#7289da] hover:text-white"><i class="fa-brands fa-discord"></i> Copier</button>
+                                        ${isManager() ? `<button onclick="regenerateEmployeePassword('${emp.id}')" class="text-[11px] text-orange-400"><i class="fa-solid fa-key"></i> MDP</button>` : ''}
+                                    </div>
+                                </div>
+                            ` : ''}
+                        </div>
+                        <div class="grid grid-cols-2 gap-2 pt-2 border-t border-dark-800 text-center">
+                            <div class="bg-dark-800/60 rounded-lg p-2"><div class="text-[10px] text-gray-400 uppercase">Ventes</div><div class="font-racing text-lg font-bold text-white">${empSales.length}</div></div>
+                            <div class="bg-dark-800/60 rounded-lg p-2"><div class="text-[10px] text-gray-400 uppercase">CA</div><div class="font-racing text-lg font-bold text-emerald-400">$${revenue.toLocaleString('fr-FR')}</div></div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        window.addEventListener('DOMContentLoaded', initApp);
+    </script>
+</body>
+</html>
